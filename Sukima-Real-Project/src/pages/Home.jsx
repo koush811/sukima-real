@@ -9,7 +9,7 @@ import usePosts from "../hooks/usePosts";
 function Home(){
 
     const posts = usePosts();
-
+    
     return(
 
         <>

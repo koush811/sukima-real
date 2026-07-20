@@ -1,35 +1,26 @@
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider, db } from "../firebase/firebase";
+
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
 
 function Login() {
-
-  const { user } = useAuth();
-
-    useEffect(() => {
-    if (user) {
-        navigate("/home");
-    }
-    }, [user]);
-
   const navigate = useNavigate();
 
-  async function GoogleLogin() {
+  async function LoginGoogle() {
     try {
       const result = await signInWithPopup(auth, provider);
 
       const user = result.user;
 
+      // users/{uid}
       const userRef = doc(db, "users", user.uid);
 
       const snap = await getDoc(userRef);
 
+      // 初回ログインなら作成
       if (!snap.exists()) {
         await setDoc(userRef, {
-          uid: user.uid,
           username: user.displayName,
           email: user.email,
           photoURL: user.photoURL,
@@ -38,20 +29,20 @@ function Login() {
       }
 
       navigate("/home");
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
       alert("ログインに失敗しました");
     }
   }
 
   return (
-    <div>
+    <>
       <h1>Sukima Real</h1>
 
-      <button onClick={GoogleLogin}>
+      <button onClick={LoginGoogle}>
         Googleでログイン
       </button>
-    </div>
+    </>
   );
 }
 
