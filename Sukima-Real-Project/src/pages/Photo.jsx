@@ -4,6 +4,7 @@ import { storage, db, auth } from "../firebase/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
+
 function Photo() {
   const inputRef = useRef(null);
 
