@@ -1,4 +1,8 @@
 import { Routes, Route } from "react-router-dom";
+import { useEffect, useState } from "react";
+
+import { auth } from "./firebase/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 import Login from "./pages/Login";
 import Home from "./pages/Home";
@@ -6,48 +10,56 @@ import Schedule from "./pages/Schedule";
 import Photo from "./pages/Photo";
 import Detail from "./pages/Detail";
 
-import ProtectedRoute from "./components/ProtectedRoute";
-
 function App() {
+
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+
+      setUser(currentUser);
+      setLoading(false);
+
+    });
+
+    return unsubscribe;
+
+  }, []);
+
+  if (loading) {
+    return <h2>Loading...</h2>;
+  }
+
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
+
+      <Route
+        path="/"
+        element={user ? <Home /> : <Login />}
+      />
 
       <Route
         path="/home"
-        element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        }
+        element={user ? <Home /> : <Login />}
       />
 
       <Route
         path="/schedule"
-        element={
-          <ProtectedRoute>
-            <Schedule />
-          </ProtectedRoute>
-        }
+        element={user ? <Schedule /> : <Login />}
       />
 
       <Route
         path="/photo"
-        element={
-          <ProtectedRoute>
-            <Photo />
-          </ProtectedRoute>
-        }
+        element={user ? <Photo /> : <Login />}
       />
 
       <Route
         path="/detail/:id"
-        element={
-          <ProtectedRoute>
-            <Detail />
-          </ProtectedRoute>
-        }
+        element={user ? <Detail /> : <Login />}
       />
+
     </Routes>
   );
 }
